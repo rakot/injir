@@ -114,35 +114,40 @@ class Injir {
         }
 
         let textValue = '';
-        if(item.textNode) {
-          const textNodes = getTextNodes(dataContainer);
 
-          if(textNodes.length) {
-            textValue = getElementFromArray(textNodes, item.textNode.position ).nodeValue;
-          } else {
-            textValue = '';
-          }
+        if(item.attribute) {
+          textValue = dataContainer.attr(item.attribute);
         } else {
-          textValue = dataContainer.text();
-        }
+          if (item.textNode) {
+            const textNodes = getTextNodes(dataContainer);
 
-        if(textValue && textValue.trim) {
-          textValue = textValue.trim();
-        }
-
-        if(item.replaceFix) {
-          item.replaceFix.forEach((replacement) => {
-            textValue = textValue.replace(replacement.from, replacement.to);
-          });
-        }
-
-        if(item.separator) {
-          let separator = item.separator.separator;
-          if(separator === 'SPACE') {
-            separator = /\s+/;
+            if (textNodes.length) {
+              textValue = getElementFromArray(textNodes, item.textNode.position).nodeValue;
+            } else {
+              textValue = '';
+            }
+          } else {
+            textValue = dataContainer.text();
           }
-          const textParts = textValue.split(separator);
-          textValue = getElementFromArray(textParts, item.separator.position);
+
+          if (textValue && textValue.trim) {
+            textValue = textValue.trim();
+          }
+
+          if (item.replaceFix) {
+            item.replaceFix.forEach((replacement) => {
+              textValue = textValue.replace(replacement.from, replacement.to);
+            });
+          }
+
+          if (item.separator) {
+            let separator = item.separator.separator;
+            if (separator === 'SPACE') {
+              separator = /\s+/;
+            }
+            const textParts = textValue.split(separator);
+            textValue = getElementFromArray(textParts, item.separator.position);
+          }
         }
 
         result[item.key] = textValue;

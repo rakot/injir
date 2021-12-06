@@ -19,7 +19,7 @@ export const PRICE_HTML = `<div class="wrapper">
                     1,240
                     <span class="a-price-decimal">.</span>
                 </span>
-                <span class="a-price-fraction">00</span>
+                <span class="a-price-fraction" data-test="Iphone price">00</span>
             </span>
         </div>
         <button type="submit" value="sign up">Sign Up</button>
@@ -33,7 +33,7 @@ export const PRICE_HTML = `<div class="wrapper">
                     1,150
                     <span class="a-price-decimal">.</span>
                 </span>
-                <span class="a-price-fraction">00</span>
+                <span class="a-price-fraction"  data-test="Google price">00</span>
             </span>
         </div>
         <button type="submit" value="sign up">Sign Up</button>
