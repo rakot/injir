@@ -16,31 +16,29 @@ Include injir.js
 ## 💎 Customization
 
 ### Config description
-**container:** Any jQuery supported selector
 
-    container: '.wrapper .row'
+| Key | Type | Default | Description |
+| --- | --- | --- | --- |
+| container | string | none (req) | Any jQuery supported selector |
+| pollInTimeout | int | undefined | If need to poll for element, instead of running once |
+| overwriteChecker | object | undefined | Sometimes site overwrites elements, it can erase injected content, you can pass jQuery selector or function to check, was injected content removed and need to re-run worker |
+| alreadyCaptured | object | `{type: 'data', name: 'injir-captured', value: 'yes'}` | If you are using pollInTimeout, you need to mark container already captured by instance. By default it will add data attribute to container, but you can customize it |
+| dataToParse | array | undefinded | If your worker needs to have some data parsed inside the container, you can define it. It should be array of objects. |
 
+### Examples
 
-**pollInTimeout:** If need to poll for element, instead of running once
+**overwriteChecker:** 
 
-    pollInTimeout: 1000
-
-**overwriteChecker:** Sometimes site overwrites elements, 
-it can erase injected content, you can pass jQuery selector or function
-to check, was injected content removed and need to rerun worker
-
-    overwriteChecker: '.injected-content'
-
-or
-
-    overwriteChecker: (container) {
-        if(container.find('.injected-content').length) return false;
-        return true;
+    overwriteChecker: {
+        selector: '.injected-content',
+        parseData: true,
+        mutationObserver: {
+            attributes: false
+        },
+        timeout: 1000
     }
 
-**alreadyCaptured:** If you are using pollInTimeout, you need to mark
-container already captured by instance. By default it will add data
-attribute to container, but you can customize it
+**alreadyCaptured:** 
 
     alreadyCaptured: {type: 'data', name: 'injir-captured', value: 'yes'}
 or
@@ -51,8 +49,7 @@ or
 
     alreadyCaptured: {type: 'content', value: '.injir-captured'}
 
-**dataToParse:** If your worker needs to have some data parsed
-inside the container, you can define it. It should be array of objects.
+**dataToParse:** 
 
     dataToParse: [
         {

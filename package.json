@@ -1,6 +1,6 @@
 {
   "name": "@rakot/injir",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "DOM injection library",
   "main": "build/index.js",
   "private": true,

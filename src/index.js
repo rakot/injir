@@ -23,7 +23,7 @@ class Injir {
   #parseConfig() {
     const _ = this;
 
-    if(_.#config.alreadyCaptured) {
+    if(_.#config.alreadyCaptured !== undefined) {
       _.#alreadyCaptured = _.#config.alreadyCaptured;
     }
 
@@ -37,14 +37,10 @@ class Injir {
         }, _.#config.pollInTimeout);
       }
     }
-    // _.#checkIsContainerAlreadyProcessed();
   }
 
   #parseContainer(selector) {
     const _ = this, $ = _.#$;
-
-    //pollInTimeout
-    //productSelector
 
     $(selector).each(function () {
       const self = $(this);
@@ -61,8 +57,11 @@ class Injir {
    * @returns {boolean}
    */
   #checkIsAlreadyCaptured(container) {
-    const _ = this, $ = _.#$;
-    if(_.#alreadyCaptured.type === 'data') {
+    const _ = this;
+    if(_.#alreadyCaptured === false) {
+      return false;
+    }
+    else if(_.#alreadyCaptured.type === 'data') {
       if(container.data(_.#alreadyCaptured.name) === _.#alreadyCaptured.value) {
         return true;
       }
@@ -80,7 +79,7 @@ class Injir {
 
 
   #pushContainerInResults(container) {
-    const _ = this, $ = _.#$;
+    const _ = this;
 
     if(_.#alreadyCaptured.type === 'data') {
       container.data(_.#alreadyCaptured.name, _.#alreadyCaptured.value);
@@ -98,12 +97,69 @@ class Injir {
     _.result.push(item);
 
     if(_.#worker) {
-      _.#worker(container, data);
+      _.#worker(container, data, true);
+
+      if(_.#config.overwriteChecker) {
+        _.#applyOverwriteChecker(item);
+      }
+    }
+  }
+
+  #applyOverwriteChecker(item) {
+    const _ = this, checker = _.#config.overwriteChecker;
+    let dataChanged = false;
+    let callback = () => {
+      if(item.mutationBlock === true) return;
+
+      if(item.container.find(checker.selector).length === 0) {
+        if(checker.parseData === true) {
+          const data = _.#parseNeededData(item.container);
+          if(JSON.stringify(data) !== JSON.stringify(data)) {
+            item.data = data;
+            dataChanged = true;
+          }
+        }
+        // Blocking rerun mutationObserver by self mutation
+        _.#disableObserver(item);
+        _.#worker(item.container, item.data, dataChanged);
+        _.#applyObserverConfig(checker, item, callback);
+      }
+    };
+
+    if(checker.mutationObserver !== undefined) {
+      _.#applyObserverConfig(checker, item, callback);
+    }
+    else if(checker.timeout && checker.selector) {
+      item.checkerInterval = setInterval(() => {
+        callback();
+      },checker.timeout);
+    }
+  }
+
+  #disableObserver(item) {
+    if(item.observer) {
+      item.observer.disconnect();
+      item.observer = undefined;
+    }
+  }
+
+  #applyObserverConfig(config, item, callback) {
+    if(config.mutationObserver !== undefined) {
+      const mutationConfig = { attributes: true, childList: true, subtree: true };
+      if(config.mutationObserver.attributes === false) mutationConfig.attributes = false;
+      if(config.mutationObserver.childList === false) mutationConfig.childList = false;
+      if(config.mutationObserver.subtree === false) mutationConfig.subtree = false;
+
+      const observer = new MutationObserver(() => {
+        callback();
+      });
+      observer.observe(item.container[0], mutationConfig);
+      item.observer = observer;
     }
   }
 
   #parseNeededData(container) {
-    const _ = this, $ = _.#$, result = {};
+    const _ = this, result = {};
 
     if(Array.isArray(_.#config.dataToParse) && _.#config.dataToParse.length)
     {

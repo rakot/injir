@@ -71,25 +71,3 @@ test('Poll in timeout', done => {
     }
   }, 1500);
 });
-
-test('Parsing price data', () => {
-  document.body.innerHTML = PRICE_HTML;
-  const $ = require('jquery');
-
-  const inst = new Injir({
-    container: '.wrapper .row',
-    dataToParse: [
-      {key: 'title', container: '.product'},
-      {key: 'price', container: '.a-price-whole', textNode: {'position': 'FIRST'}},
-      {key: 'attr', container: '.a-price-fraction', attribute: 'data-test'}
-    ]
-  }, (container, data) => {
-    if(data.title === 'Apple Iphone') {
-      expect(data.price).toEqual('1,240');
-      expect(data.attr).toEqual('Iphone price');
-    } else {
-      expect(data.price).toEqual('1,150');
-      expect(data.attr).toEqual('Google price');
-    }
-  });
-});
