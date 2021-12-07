@@ -30,6 +30,8 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     library: 'Injir',
     libraryTarget: 'umd',
+    libraryExport: 'default',
+    globalObject: 'this',
     clean: true
   },
   optimization: {
